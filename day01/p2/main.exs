@@ -1,4 +1,9 @@
 defmodule Day1.Main do
+  @moduledoc """
+  https://adventofcode.com/2021/day/1
+  Result:
+  """
+
   def run(filename) do
     filename
     |> File.stream!()
