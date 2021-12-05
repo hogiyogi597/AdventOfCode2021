@@ -1,6 +1,6 @@
 defmodule Day5.Part2.Main do
   @moduledoc """
-  https://adventofcode.com/2021/day/4
+  https://adventofcode.com/2021/day/5
   Result: 21038
   """
 
