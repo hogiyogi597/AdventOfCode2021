@@ -16,6 +16,16 @@ defmodule Day8.Part2.Main do
   defp process_line(line) do
     [inputs, outputs] = String.split(line, ["|"], trim: true)
 
+    keys = get_keys(inputs)
+
+    outputs
+    |> create_map_sets()
+    |> Enum.map(fn set -> keys |> Enum.find_index(& &1 == set) end)
+    |> Enum.join()
+    |> String.to_integer()
+  end
+
+  defp get_keys(inputs) do
     sets = inputs
     |> create_map_sets()
     |> Enum.reduce(List.duplicate([], 8), fn set, acc ->
@@ -31,19 +41,21 @@ defmodule Day8.Part2.Main do
     three =
       sets
       |> get_list(5)
-      |> Enum.find(fn set ->
-        intersection(set, seven) == seven
-      end)
+      |> Enum.find(& subset?(seven, &1))
 
-    middle_segment = intersection(three, four) |> difference(one)
-    left_top_segment = difference(four, three)
+    middle_segment =
+      three
+      |> intersection(four)
+      |> difference(one)
+
+    left_top_segment =
+      four
+      |> difference(three)
 
     five =
       sets
       |> get_list(5)
-      |> Enum.find(fn set ->
-        size(intersection(left_top_segment, set)) > 0
-      end)
+      |> Enum.find(& subset?(left_top_segment, &1))
 
     two =
       sets
@@ -54,31 +66,26 @@ defmodule Day8.Part2.Main do
         _set -> true
       end)
 
-    {[nine | []], rest} =
+    nine =
       sets
       |> get_list(6)
-      |> Enum.split_with(fn set ->
-        intersection(set, three) == three
+      |> Enum.find(& subset?(three, &1))
+
+    zero =
+      sets
+      |> get_list(6)
+      |> Enum.find(fn set -> union(set, middle_segment) == eight end)
+
+    six =
+      sets
+      |> get_list(6)
+      |> Enum.find(fn
+        set when set == nine -> false
+        set when set == zero -> false
+        _set -> true
       end)
 
-    {[zero | []], [six | []]} =
-      rest
-      |> Enum.split_with(fn set ->
-        difference(set, middle_segment) == set
-      end)
-
-    keys = [zero, one, two, three, four, five, six, seven, eight, nine]
-
-    outputs
-    |> create_map_sets()
-    |> Enum.reduce([], fn set, acc ->
-      index = keys
-      |> Enum.find_index(& &1 == set)
-      [index | acc]
-    end)
-    |> Enum.join()
-    |> String.reverse()
-    |> String.to_integer()
+    [zero, one, two, three, four, five, six, seven, eight, nine]
   end
 
   defp create_map_sets(inputs) do
